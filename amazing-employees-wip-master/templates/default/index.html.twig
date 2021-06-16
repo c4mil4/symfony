@@ -1,0 +1,41 @@
+{% extends 'base.html.twig' %}
+
+{% block header %}
+    {{ include('partial/header.html.twig') }}
+{% endblock %}
+
+{% block body %}
+    <table>
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Email</th>
+                <th>Localidad</th>            
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for person in people %}
+            <tr>
+                <td>{{ person.name }}</td>
+                <td>{{ person.email }}</td>
+                <td>{{ person.city }}</td>
+                <td>
+                    <ul>
+                        <li><a href="{{ path('default_show', { id: loop.index0 }) }}">Ver en formato HTML</a></li>
+                        <li><a href="#">Ver en formato JSON</a></li>
+                    </ul>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
+
+{% block stylesheets %}
+<style>
+    body {
+        background-color: pink;
+    }
+</style>
+{% endblock %}
