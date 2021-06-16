@@ -1,9 +1,7 @@
 {% extends 'base.html.twig' %}
-
 {% block header %}
     {{ include('partial/header.html.twig') }}
 {% endblock %}
-
 {% block body %}
     <table>
         <thead>
@@ -24,6 +22,7 @@
                     <ul>
                         <li><a href="{{ path('default_show', { id: loop.index0 }) }}">Ver en formato HTML</a></li>
                         <li><a href="#">Ver en formato JSON</a></li>
+                        <li><a href="{{ path('default_index_json', { _format: 'json',  id: loop.index0 }) }}">Ver en formato JSON</a></li>
                     </ul>
                 </td>
             </tr>
@@ -31,7 +30,6 @@
         </tbody>
     </table>
 {% endblock %}
-
 {% block stylesheets %}
 <style>
     body {

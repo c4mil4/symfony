@@ -7,7 +7,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
- * @Route("/api/employees", name="api_employess_")
+ * @Route("/api", name="api_")
  */
 class ApiController extends AbstractController
 {
@@ -22,11 +22,7 @@ class ApiController extends AbstractController
         ]);
     }
 
-}
-
-
-/* BORRAR SI NO SE NECESITA */
-  /**
+    /**
      * @Route("/{id}", name="show")
      */
    /*  public function show(): Response
@@ -36,3 +32,4 @@ class ApiController extends AbstractController
             'path' => 'src/Controller/ApiController.php',
         ]);
     } */
+}
