@@ -1,11 +1,17 @@
 <?php
+
 namespace App\Controller;
+
+use App\Entity\Employee;
+use App\Repository\EmployeeRepository;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
- * @Route("/api/employees", name="api_employees_")
  * @Route("/api/amazing-employees", name="api_employees_")
  */
 class ApiEmployeesController extends AbstractController
@@ -17,13 +23,17 @@ class ApiEmployeesController extends AbstractController
      *      methods={"GET"}
      * )
      */
-    public function index(): Response
+    public function index(Request $request, EmployeeRepository $employeeRepository): Response
     {
-        return $this->json([
-            'method' => 'CGET',
-            'description' => 'Devuelve el listado del recurso empleados.',
-        ]);
+        if ($request->query->has('term')) {
+            $people = $employeeRepository->findByTerm($request->query->get('term'));
+
+            return $this->json($people);
+        }
+
+        return $this->json($employeeRepository->findAll());
     }
+
     /**
      * @Route(
      *      "/{id}",
@@ -34,13 +44,16 @@ class ApiEmployeesController extends AbstractController
      *      }
      * )
      */
-    public function show(int $id): Response
+    public function show(int $id, EmployeeRepository $employeeRepository): Response
     {
-        return $this->json([
-            'method' => 'GET',
-            'description' => 'Devuelve un solo recurso empleado con id: '.$id.'.',
-        ]);
+        $data = $employeeRepository->find($id);
+
+        dump($id);
+        dump($data);
+
+        return $this->json($data);
     }
+
     /**
      * @Route(
      *      "",
@@ -48,12 +61,43 @@ class ApiEmployeesController extends AbstractController
      *      methods={"POST"}
      * )
      */
-    public function add(): Response {
-        return  $this->json([
-            'method' => 'POST',
-            'description' => 'Crea un recurso empleado.',
-        ]);
+    public function add(
+        Request $request,
+        EntityManagerInterface $entityManager
+    ): Response {
+        $data = $request->request;
+
+        $employee = new Employee();
+
+        $employee->setName($data->get('name'));
+        $employee->setEmail($data->get('email'));
+        $employee->setAge($data->get('age'));
+        $employee->setCity($data->get('city'));
+        $employee->setPhone($data->get('phone'));
+
+        $entityManager->persist($employee);
+        //$employee no tiene id.
+        $entityManager->flush();
+
+        dump($employee);
+
+        return  $this->json(
+            $employee,
+            Response::HTTP_CREATED,
+            [
+                'Location' => $this->generateUrl(
+                    'api_employees_get',
+                    [
+                        'id' => $employee->getId()
+                    ]
+
+                )
+
+        ]
+        );
     }
+
+
     /**
      * @Route(
      *      "/{id}",
@@ -64,13 +108,32 @@ class ApiEmployeesController extends AbstractController
      *      }
      * )
      */
-    public function update(int $id): Response
+    public function update(
+        Employee $employee,
+        EntityManagerInterface $entityManager,
+        Request $request
+    ): Response
     {
+        $data = $request->request;
+
+        $employee->setName($data->get('name'));
+        $employee->setEmail($data->get('email'));
+        $employee->setAge($data->get('age'));
+        $employee->setCity($data->get('city'));
+        $employee->setPhone($data->get('phone'));
+
+        $entityManager->persist($employee);
+
+        $entityManager->flush(); 
+
+        $id = $employee->getId(); 
+
         return $this->json([
             'method' => 'PUT',
-            'description' => 'Actualiza un recurso empleado con id: '.$id.'.',
+            'description' => "Actualiza un recurso empleado con id: $id",
         ]);
     }
+
     /**
      * @Route(
      *      "/{id}",
@@ -81,11 +144,25 @@ class ApiEmployeesController extends AbstractController
      *      }
      * )
      */
-    public function remove(int $id): Response
-    {
-        return $this->json([
-            'method' => 'DELETE',
-            'description' => 'Elimina un recurso empleado con id: '.$id.'.',
-        ]);
+    public function remove(
+        Employee $employee, 
+        EntityManagerInterface $entityManager
+    ): Response
+        {
+
+        if(!$employee) {
+            return $this->json([
+                'message' => sprintf('No he encontrado el empledo con id.: %s', $employee)
+            ], Response::HTTP_NOT_FOUND);
+        }
+
+        dump($employee);
+
+        // remove() prepara el sistema pero NO ejecuta la sentencia.
+        $entityManager->remove($employee);
+        $entityManager->flush();
+
+        return $this->json(null, Response::HTTP_NO_CONTENT);
     }
+
 }

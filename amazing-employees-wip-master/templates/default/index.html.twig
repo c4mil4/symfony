@@ -1,14 +1,21 @@
 {% extends 'base.html.twig' %}
+
 {% block header %}
     {{ include('partial/header.html.twig') }}
 {% endblock %}
+
 {% block body %}
+    <form method="GET">
+        <input type="text" name="term" />
+        <input type="submit" value="Buscar" />
+    </form>
+    <hr/>
     <table>
         <thead>
             <tr>
-                <th>Nombre</th>
-                <th>Email</th>
-                <th>Localidad</th>            
+                <th>Nombre <a href="{{ path('default_index', { orderBy: 'name', orderDir: 'DESC'}) }}">⬆</a>&nbsp;<a href="{{ path('default_index', { orderBy: 'name', orderDir: 'ASC'}) }}">⬇</a></th>
+                <th>Email <a href="{{ path('default_index', { orderBy: 'email', orderDir: 'DESC'}) }}">⬆</a>&nbsp;<a href="{{ path('default_index', { orderBy: 'email', orderDir: 'ASC'}) }}">⬇</a></th>
+                <th>Ciudad <a href="{{ path('default_index', { orderBy: 'city', orderDir: 'DESC'}) }}">⬆</a>&nbsp;<a href="{{ path('default_index', { orderBy: 'city', orderDir: 'ASC'}) }}">⬇</a></th>
                 <th>Acciones</th>
             </tr>
         </thead>
@@ -20,9 +27,8 @@
                 <td>{{ person.city }}</td>
                 <td>
                     <ul>
-                        <li><a href="{{ path('default_show', { id: loop.index0 }) }}">Ver en formato HTML</a></li>
-                        <li><a href="#">Ver en formato JSON</a></li>
-                        <li><a href="{{ path('default_index_json', { _format: 'json',  id: loop.index0 }) }}">Ver en formato JSON</a></li>
+                        <li><a href="{{ path('default_show', { id: person.id }) }}">Ver en formato HTML</a></li>
+                        <li><a href="{{ path('default_index_json', { _format: 'json',  id: person.id }) }}">Ver en formato JSON</a></li>
                     </ul>
                 </td>
             </tr>
@@ -30,6 +36,7 @@
         </tbody>
     </table>
 {% endblock %}
+
 {% block stylesheets %}
 <style>
     body {

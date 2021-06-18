@@ -4,6 +4,8 @@ namespace App\Entity;
 
 use App\Repository\EmployeeRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
+
 
 /**
  * @ORM\Entity(repositoryClass=EmployeeRepository::class)
@@ -19,16 +21,27 @@ class Employee
 
     /**
      * @ORM\Column(type="string", length=128)
+     * 
+     * @Assert\NotBlank
      */
     private $name;
 
     /**
      * @ORM\Column(type="string", length=128)
+     * @Assert\Email(
+     *     message = "El correo{{ value }} no tiene formato valido."
+     * )
+     * 
      */
     private $email;
 
     /**
      * @ORM\Column(type="smallint")
+     * 
+     * @Assert\GratherThanOrEqual (
+     *    value=18,
+     *    message = "El empleado debe ser mayor de edad."
+     * )
      */
     private $age;
 
@@ -38,7 +51,7 @@ class Employee
     private $city;
 
     /**
-     * @ORM\Column(type="string", length=12)
+     * @ORM\Column(type="string", length=64, nullable=true)
      */
     private $phone;
 
@@ -100,7 +113,7 @@ class Employee
         return $this->phone;
     }
 
-    public function setPhone(string $phone): self
+    public function setPhone(?string $phone): self
     {
         $this->phone = $phone;
 

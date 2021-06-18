@@ -10,11 +10,11 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20210616104039 extends AbstractMigration
+final class Version20210615114028 extends AbstractMigration
 {
     public function getDescription(): string
     {
-        return 'Crear la primera version de la tabla para la entidad Employee';
+        return 'Crear la primera versión de la tabla para la entidad Employee';
     }
 
     public function up(Schema $schema): void
