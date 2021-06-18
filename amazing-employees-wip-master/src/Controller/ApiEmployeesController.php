@@ -10,6 +10,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
  * @Route("/api/amazing-employees", name="api_employees_")
@@ -63,7 +64,8 @@ class ApiEmployeesController extends AbstractController
      */
     public function add(
         Request $request,
-        EntityManagerInterface $entityManager
+        EntityManagerInterface $entityManager,
+        ValidatorInterface $validator
     ): Response {
         $data = $request->request;
 
@@ -75,11 +77,27 @@ class ApiEmployeesController extends AbstractController
         $employee->setCity($data->get('city'));
         $employee->setPhone($data->get('phone'));
 
+        $errors = $validator->validate($employee);
+
+        if (count($errors) > 0) {
+            $dataErrors = [];
+            /** @var \Symfony\Component\Validator\ConstraintValidator**/
+            foreach ($errors as $theError) {
+                $dataErrors[] = $theError->getMessege();
+            }
+            return $this->json(
+                [
+                'status' => 'error',
+                'data' => [
+                    'errors' => $dataErrors
+                ]
+                ],
+                Response::HTTP_BAD_REQUEST);
+            
+        }
         $entityManager->persist($employee);
         //$employee no tiene id.
         $entityManager->flush();
-
-        dump($employee);
 
         return  $this->json(
             $employee,
@@ -90,7 +108,6 @@ class ApiEmployeesController extends AbstractController
                     [
                         'id' => $employee->getId()
                     ]
-
                 )
 
         ]
@@ -112,8 +129,7 @@ class ApiEmployeesController extends AbstractController
         Employee $employee,
         EntityManagerInterface $entityManager,
         Request $request
-    ): Response
-    {
+    ): Response {
         $data = $request->request;
 
         $employee->setName($data->get('name'));
@@ -124,9 +140,9 @@ class ApiEmployeesController extends AbstractController
 
         $entityManager->persist($employee);
 
-        $entityManager->flush(); 
+        $entityManager->flush();
 
-        $id = $employee->getId(); 
+        $id = $employee->getId();
 
         return $this->json([
             'method' => 'PUT',
@@ -145,12 +161,10 @@ class ApiEmployeesController extends AbstractController
      * )
      */
     public function remove(
-        Employee $employee, 
+        Employee $employee,
         EntityManagerInterface $entityManager
-    ): Response
-        {
-
-        if(!$employee) {
+    ): Response {
+        if (!$employee) {
             return $this->json([
                 'message' => sprintf('No he encontrado el empledo con id.: %s', $employee)
             ], Response::HTTP_NOT_FOUND);
@@ -164,5 +178,4 @@ class ApiEmployeesController extends AbstractController
 
         return $this->json(null, Response::HTTP_NO_CONTENT);
     }
-
 }

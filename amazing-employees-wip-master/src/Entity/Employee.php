@@ -27,7 +27,7 @@ class Employee
     private $name;
 
     /**
-     * @ORM\Column(type="string", length=128)
+     * @ORM\Column(type="string", length=128, unique=true)
      * @Assert\Email(
      *     message = "El correo{{ value }} no tiene formato valido."
      * )
@@ -38,7 +38,7 @@ class Employee
     /**
      * @ORM\Column(type="smallint")
      * 
-     * @Assert\GratherThanOrEqual (
+     * @Assert\GreaterThanOrEqual (
      *    value=18,
      *    message = "El empleado debe ser mayor de edad."
      * )
@@ -55,6 +55,12 @@ class Employee
      */
     private $phone;
 
+    /**
+     * @ORM\ManyToOne(targetEntity=Departament::class, inversedBy="employees")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $departament;
+  
     public function getId(): ?int
     {
         return $this->id;
@@ -119,4 +125,17 @@ class Employee
 
         return $this;
     }
+
+    public function getDepartament(): ?Departament
+    {
+        return $this->departament;
+    }
+
+    public function setDepartament(?Departament $departament): self
+    {
+        $this->departament = $departament;
+
+        return $this;
+    }
+    
 }
